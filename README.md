@@ -8,3 +8,6 @@ A higher-effeciency Twisted rolling application with customizability and support
 4. Make sure to visit preferences and setup **AT LEAST ONCE** before using, or you will encounter multiple errors.
 5. Make sure your game is in fullscreen, or it MAY encounter issues.
 6. Enjoy.
+
+## VISIT DISCORD FOR MORE INFO / HELP / ETC
+[Discord](https://discord.gg/bjRZ82zXAZ)
