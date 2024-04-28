@@ -1,12 +1,13 @@
 import re
 import pytesseract
-from PIL import ImageGrab
+from PIL import ImageGrab, ImageOps
 import configparser
 import time
 import roblox
 import tkinter as tk
 import gui
 from tkinter import messagebox
+import webhooks
 
 
 def getThermos():
@@ -21,7 +22,7 @@ def getThermos():
     elif sw == "1080p":
         region = (550, 105, 1365, 660)
     else:
-        print("Screen resolution invalid.")
+
         exit()
 
     # Grab a screenshot of the specified region
@@ -40,7 +41,7 @@ def getThermos():
     ("DEWPOINT", r"DEWPOINT: (\d+)F"),
     ("CAPE", r"CAPE: (\d+) J/kg"),
     ("THREECAPE", r"3CAPE: (\d+) J/kg"),
-    ("LLAPSE", r"3-6KM LAPSE RATES: (\d+(?:\.\d+)?) C/km"),
+    ("LLAPSE", r"0-3KM LAPSE RATES: (\d+(?:\.\d+)?) C/km"),
     ("HLAPSE", r"3-6KM LAPSE RATES: (\d+(?:\.\d+)?) C/km"),
     ("STP", r"S(?:T)?P:\s?(\d+)"),
     ("VTP", r"V(?:T)?P:\s?(\d+)"),
@@ -49,14 +50,11 @@ def getThermos():
     ("SURFACERH", r"SURFACE RH: (\d+)")
     ]
     
-    print(text)
-    
     thermos = {}
     for var_name, pattern in variables:
         match = re.search(pattern, text)
         thermos[var_name] = match.group(1) if match else None
-    
-    print(thermos)
+   
 
     def compareThermos():
         config = configparser.ConfigParser()
@@ -97,9 +95,11 @@ def getThermos():
             root = tk.Tk()
             root.withdraw()
     
+            webhooks.send_thermos_discord(thermos)
             messagebox.showinfo("All Conditions Met", "All conditions are met.")
     
             root.destroy()  # Close the tkinter window and stop the mainloop
+            
         else:
             autoroll = config.get('Settings', 'autoroll')
             if autoroll == "False":
@@ -122,3 +122,27 @@ def getThermos():
 
             
     compareThermos()
+def getCode():
+    time.sleep(1)
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    sw = config.get('Settings', 'resolution')
+    
+    if sw == "1440p": 
+        region = (138, 0, 240, 57)  # Example coordinates
+    elif sw == "1080p":
+        region = (120, 0, 212, 31)
+    else:
+        exit()
+
+    # Grab a screenshot of the specified region
+    screenshot = ImageGrab.grab(bbox=region)
+
+    # preprocess the image
+    screenshot = ImageOps.invert(screenshot)
+    screenshot = ImageOps.autocontrast(screenshot)
+
+    # Use Tesseract OCR to extract text
+    time.sleep(1)
+    code = pytesseract.image_to_string(screenshot, config='--psm 7', lang='eng')
+    return code
