@@ -1,5 +1,5 @@
 # TwistedPlus2
-A higher-effeciency Twisted rolling application with customizability and support for 1080p/1440p.
+A higher-efficiency Twisted rolling application with customizability and support for 1080p/1440p.
 
 # HOW TO USE
 1. Make sure autohotkey, python, and tesseract (OCR) are all installed.
